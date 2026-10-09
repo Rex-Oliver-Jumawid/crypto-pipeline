@@ -1,0 +1,74 @@
+name: crypto-pipeline
+
+services:
+  kafka:
+    image: apache/kafka:3.9.1
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:29093"
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
+      KAFKA_LISTENERS: "CONTROLLER://:29093,INTERNAL://:19092,EXTERNAL://:9092"
+      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka:19092,EXTERNAL://localhost:9092"
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx512m"
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+    volumes:
+      - kafka_storage:/var/lib/kafka/data
+    healthcheck:
+      test:
+        - CMD
+        - /opt/kafka/bin/kafka-topics.sh
+        - --bootstrap-server
+        - localhost:19092
+        - --list
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  cassandra:
+    image: cassandra:5.0.9
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9042:9042"
+    environment:
+      CASSANDRA_CLUSTER_NAME: CryptoPipeline
+      CASSANDRA_DC: datacenter1
+      MAX_HEAP_SIZE: 1G
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'cqlsh -e "DESCRIBE KEYSPACES" >/dev/null 2>&1'
+      interval: 30s
+      timeout: 20s
+      retries: 12
+      start_period: 90s
+
+  spark:
+    image: apache/spark:3.5.9-scala2.12-java17-python3-ubuntu
+    restart: unless-stopped
+    entrypoint: ["/bin/bash", "-c"]
+    command: ["sleep infinity"]
+    ports:
+      - "127.0.0.1:4040:4040"
+    volumes:
+      - ./spark:/opt/spark/jobs:ro
+    depends_on:
+      kafka:
+        condition: service_healthy
+      cassandra:
+        condition: service_healthy
+
+volumes:
+  kafka_storage:
+  cassandra_data:

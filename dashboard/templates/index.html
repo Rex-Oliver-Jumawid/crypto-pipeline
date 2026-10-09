@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>CryptoPulse | Market Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+
+<body>
+    <div class="app">
+        <header class="topbar">
+            <div class="brand">
+                <span class="brand-icon">↗</span>
+                <div>
+                    <strong>CryptoPulse</strong>
+                    <small>Real-Time Market Intelligence</small>
+                </div>
+            </div>
+
+            <div id="connection-status" class="status">Connecting...</div>
+        </header>
+
+        <main>
+            <div class="page-heading">
+                <div>
+                    <p class="eyebrow">MARKET OVERVIEW</p>
+                    <h1>Cryptocurrency Dashboard</h1>
+                    <p class="subtitle">
+                        Streaming cryptocurrency market analytics, powered by Kafka,
+                        Spark, and Cassandra.
+                    </p>
+                </div>
+
+                <div class="refresh-info">
+                    <span>Refresh interval: 5 seconds</span>
+                    <span id="last-event">Waiting for data...</span>
+                </div>
+            </div>
+
+            <div class="coin-grid">
+                <button class="coin-card selected" data-symbol="BTC-USD" type="button">
+                    <div class="coin-head">
+                        <span class="coin-icon btc">₿</span>
+                        <span class="coin-name">
+                            <strong>Bitcoin</strong>
+                            <small>BTC / USD</small>
+                        </span>
+                        <span class="card-arrow">↗</span>
+                    </div>
+
+                    <div class="coin-price" id="btc-price">--</div>
+
+                    <div class="coin-bottom">
+                        <span id="btc-change">--</span>
+                        <small>24h change</small>
+                    </div>
+                </button>
+
+                <button class="coin-card" data-symbol="ETH-USD" type="button">
+                    <div class="coin-head">
+                        <span class="coin-icon eth">Ξ</span>
+                        <span class="coin-name">
+                            <strong>Ethereum</strong>
+                            <small>ETH / USD</small>
+                        </span>
+                        <span class="card-arrow">↗</span>
+                    </div>
+
+                    <div class="coin-price" id="eth-price">--</div>
+
+                    <div class="coin-bottom">
+                        <span id="eth-change">--</span>
+                        <small>24h change</small>
+                    </div>
+                </button>
+            </div>
+
+            <section class="panel">
+                <div class="panel-header">
+                    <div>
+                        <p class="eyebrow">MARKET MOVEMENT</p>
+                        <h2 id="chart-title">Bitcoin Price History</h2>
+                    </div>
+                    <span class="panel-note"> Last 40 recorded ticks </span>
+                </div>
+
+                <div class="chart-container">
+                    <svg id="price-chart" viewBox="0 0 900 300" role="img"
+                        aria-label="Recent cryptocurrency prices"></svg>
+                </div>
+
+                <p class="chart-caption">
+                    Recent recorded prices, not a 24-hour historical chart. Timestamps
+                    in UTC.
+                </p>
+            </section>
+
+            <section class="panel">
+                <div class="panel-header">
+                    <div>
+                        <p class="eyebrow">MARKET DETAILS</p>
+                        <h2 id="table-title">Bitcoin Market Records</h2>
+                    </div>
+                    <span class="panel-note"> Latest 15 records </span>
+                </div>
+
+                <div class="metrics">
+                    <div>
+                        <small>24h High</small>
+                        <strong id="high-price">--</strong>
+                    </div>
+                    <div>
+                        <small>24h Low</small>
+                        <strong id="low-price">--</strong>
+                    </div>
+                    <div>
+                        <small>24h Volume</small>
+                        <strong id="market-volume">--</strong>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Event Time (UTC)</th>
+                                <th>Market Price</th>
+                                <th>24h Change</th>
+                                <th>24h Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody id="market-table">
+                            <tr>
+                                <td colspan="4">Loading market data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <footer>Coinbase Exchange → Kafka → Spark → Cassandra → Flask</footer>
+        </main>
+    </div>
+</body>
+
+</html>
