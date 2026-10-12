@@ -7,7 +7,7 @@ import websocket
 from kafka import KafkaProducer
 
 COINBASE_URL = "wss://ws-feed.exchange.coinbase.com"
-KAFKA_BROKER = "localhost:9092"
+KAFKA_BROKER = "127.0.0.1:9092"
 
 logging.basicConfig(
     level=logging.INFO,
